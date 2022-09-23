@@ -22,7 +22,7 @@ async function createWidget(game) {
     1 +
     "/" +
     new Date(game.game_date).getDate();
-  let title = `${gameDate}の公式戦`;
+  let title = `${gameDate} ${game.name}`;
   let widget = new ListWidget();
   // Add background gradient
   let gradient = new LinearGradient();
@@ -32,11 +32,16 @@ async function createWidget(game) {
   // Show app icon and title
   let titleStack = widget.addStack();
   titleStack.addSpacer(4);
+  let docsSymbol = SFSymbol.named("baseball");
+  let docsElement = titleStack.addImage(docsSymbol.image);
+  docsElement.imageSize = new Size(13, 13);
+  docsElement.tintColor = Color.white();
+  docsElement.imageOpacity = 0.5;
   let titleElement = titleStack.addText(title);
   titleElement.textColor = Color.white();
   titleElement.textOpacity = 0.7;
   titleElement.font = Font.mediumSystemFont(13);
-  widget.addSpacer(12);
+  widget.addSpacer(4);
   titleStack.addSpacer(6);
   const resultStack = widget.addStack();
   // Show API
@@ -49,17 +54,24 @@ async function createWidget(game) {
   firstTElement.textColor = Color.white();
   firstTElement.font = Font.mediumSystemFont(18);
   firstTElement;
-  scoreStack.addText(String(game.first_run));
+  const firstRunElement = scoreStack.addText(String(game.first_run));
+  firstRunElement.textColor = game.first_run > game.last_run? Color.orange(): Color.white()
   let lastTElement = teamNameStack.addText(game.last_team_name);
   lastTElement.textColor = Color.white();
   lastTElement.font = Font.mediumSystemFont(18);
-  scoreStack.addText(String(game.last_run));
+  const lastRunElement = scoreStack.addText(String(game.last_run));
+  lastRunElement.textColor = game.first_run < game.last_run? Color.orange(): Color.white()
+  widget.addSpacer(4)
+  const progressText = widget.addText(progress(game))
+  progressText.font = Font.mediumSystemFont(13);
+  progressText.textOpacity = 0.7
   // UI presented in Siri ans Shortcuta is non-interactive, so we only show the footer when not running the script from Siri.
   if (!config.runsWithSiri) {
     widget.addSpacer(8);
     // Add button to open documentation
     let linkSymbol = SFSymbol.named("arrow.up.forward");
     let footerStack = widget.addStack();
+    
     let linkStack = footerStack.addStack();
     linkStack.centerAlignContent();
     linkStack.url = `https://cap-scorebook.com/game/${game.game_id}`;
@@ -70,21 +82,14 @@ async function createWidget(game) {
     let linkSymbolElement = linkStack.addImage(linkSymbol.image);
     linkSymbolElement.imageSize = new Size(11, 11);
     linkSymbolElement.tintColor = Color.blue();
-    footerStack.addSpacer();
-    // Add link to documentation
-    let docsSymbol = SFSymbol.named("baseball");
-    let docsElement = footerStack.addImage(docsSymbol.image);
-    docsElement.imageSize = new Size(20, 20);
-    docsElement.tintColor = Color.white();
-    docsElement.imageOpacity = 0.5;
-    docsElement.url = "https://docs.scriptable.app";
+    footerStack.addSpacer()
   }
   return widget;
 }
 
 async function gameAPI() {
   const beginDate = new Date();
-  beginDate.setTime(beginDate.getTime() - 7 * DAY_IN_MICROSECONDS);
+  beginDate.setTime(beginDate.getTime() - 14 * DAY_IN_MICROSECONDS);
   let games = (await loadGames()).filter((game) => {
     return (
       new Date(game.game_date) >= beginDate &&
@@ -120,3 +125,43 @@ async function loadTeamIcon(id) {
     return null
   }
 }
+
+function progress(game){
+  let title = "";
+  const inningArray = [
+    "_1st",
+    "_2nd",
+    "_3rd",
+    "_4th",
+    "_5th",
+    "_6th",
+    "_7th",
+    "_8th",
+    "_9th",
+  ];
+
+  if (game.locked) {
+    title = "試合終了";
+  } else {
+    let top = 0;
+    let bottom = 0;
+    for (let i = 0; i < inningArray.length; i++) {
+      if (game["top" + inningArray[i]] !== null) {
+        top = i + 1;
+      }
+      if (game["bottom" + inningArray[i]] !== null) {
+        bottom = i + 1;
+      }
+    }
+    if (top > bottom) {
+      title = top+ "回途中";//表
+    } else if (top === bottom) {
+      if(top > 0){
+        title = bottom + "回途中"//裏
+      } else {
+        title = '試合前'
+      }
+    }
+  }
+  return title;
+};
