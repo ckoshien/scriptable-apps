@@ -7,8 +7,7 @@ scriptableをインストールし、そこへスクリプトをコピペする�
 1. iPhone,iPadにプログラムコードを全てコピペします。
 2. 画面上にscriptableのウィジェットを追加します。
 
-
-
+### チュートリアル(音声あります)
 https://user-images.githubusercontent.com/17352441/191978411-6aa5f4a1-4da6-4c7b-aa8c-4aa9e6f1eb80.mp4
 
 
