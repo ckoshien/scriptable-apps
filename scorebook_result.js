@@ -32,11 +32,11 @@ async function createWidget(game) {
   // Show app icon and title
   let titleStack = widget.addStack();
   titleStack.addSpacer(4);
-  let docsSymbol = SFSymbol.named("baseball");
-  let docsElement = titleStack.addImage(docsSymbol.image);
-  docsElement.imageSize = new Size(13, 13);
-  docsElement.tintColor = Color.white();
-  docsElement.imageOpacity = 0.5;
+  // let docsSymbol = SFSymbol.named("baseball");
+  // let docsElement = titleStack.addImage(docsSymbol.image);
+  // docsElement.imageSize = new Size(13, 13);
+  // docsElement.tintColor = Color.white();
+  // docsElement.imageOpacity = 0.5;
   let titleElement = titleStack.addText(title);
   titleElement.textColor = Color.white();
   titleElement.textOpacity = 0.7;
